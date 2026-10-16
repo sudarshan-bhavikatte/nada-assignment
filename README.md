@@ -30,7 +30,7 @@ The server starts on port **8080**.
 
 ## Next steps with more time
 
-- Persistence (Neo4j would fit the graph model naturally at scale)
+- Persistence with database.
 - Pagination for contacts, response-size caps
 - OpenAPI docs, request logging
 - Dockerfile + GitHub Actions CI
