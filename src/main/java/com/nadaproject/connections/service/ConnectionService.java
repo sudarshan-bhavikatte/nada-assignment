@@ -52,7 +52,6 @@ public class ConnectionService {
             return new PathResponse(true, 0, List.of(people.get(from)));
         }
 
-        // BFS for shortest path with max 3 hops
         Queue<Long> queue = new LinkedList<>();
         Map<Long, Long> parentMap = new HashMap<>();
         Map<Long, Integer> distanceMap = new HashMap<>();
@@ -72,7 +71,7 @@ public class ConnectionService {
             }
 
             if (currentDist >= 3) {
-                continue; // Do not explore further than 3 hops
+                continue; 
             }
 
             Set<Long> neighbors = adjacencyList.get(current);
@@ -91,7 +90,6 @@ public class ConnectionService {
             return new PathResponse(false);
         }
 
-        // Reconstruct path
         List<Person> path = new ArrayList<>();
         Long curr = to;
         while (curr != null) {

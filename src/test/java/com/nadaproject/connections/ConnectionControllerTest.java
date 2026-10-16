@@ -40,7 +40,6 @@ class ConnectionControllerTest {
 
         Person asha = objectMapper.readValue(res1.getResponse().getContentAsString(), Person.class);
 
-        // Create person Rohan
         MvcResult res2 = mockMvc.perform(post("/people")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"name\": \"Rohan\"}"))
@@ -49,13 +48,11 @@ class ConnectionControllerTest {
 
         Person rohan = objectMapper.readValue(res2.getResponse().getContentAsString(), Person.class);
 
-        // Connect Asha and Rohan
         mockMvc.perform(post("/knows")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(Map.of("a", asha.getId(), "b", rohan.getId()))))
                 .andExpect(status().isNoContent());
 
-        // Get contacts of Asha
         mockMvc.perform(get("/people/" + asha.getId() + "/contacts"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Rohan"));
@@ -63,7 +60,6 @@ class ConnectionControllerTest {
 
     @Test
     void testPathWithinThreeHopsAndExceedingLimit() throws Exception {
-        // Create chain A -> B -> C -> D -> E (A=1, B=2, C=3, D=4, E=5)
         long idA = createPersonHelper("Asha");
         long idB = createPersonHelper("Meera");
         long idC = createPersonHelper("Kabir");
@@ -75,14 +71,12 @@ class ConnectionControllerTest {
         connectHelper(idC, idD);
         connectHelper(idD, idE);
 
-        // A to D should be connected (3 hops: A -> B -> C -> D)
         mockMvc.perform(get("/path").param("from", String.valueOf(idA)).param("to", String.valueOf(idD)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.connected").value(true))
                 .andExpect(jsonPath("$.hops").value(3))
                 .andExpect(jsonPath("$.path.length()").value(4));
 
-        // A to E should NOT be connected within 3 hops (4 hops: A -> B -> C -> D -> E)
         mockMvc.perform(get("/path").param("from", String.valueOf(idA)).param("to", String.valueOf(idE)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.connected").value(false));
@@ -99,12 +93,10 @@ class ConnectionControllerTest {
 
     @Test
     void testNotFoundAndValidationErrors() throws Exception {
-        // Unknown person 9 -> 404
         mockMvc.perform(get("/people/9/contacts"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("no person 9"));
 
-        // Blank name -> 400
         mockMvc.perform(post("/people")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"name\": \"   \"}"))
